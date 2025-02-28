@@ -1,9 +1,15 @@
 import express from "express";
 import bodyParser from "body-parser";
+import axios from "axios";
 import fs from "fs";
 import { name } from "ejs";
 
-// Important Pathing stuff - if needed
+
+// Feb 28, 2025
+//  # add import axios and example
+
+
+// Important Pathing stuff - if needed for static html, etc
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -13,6 +19,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const port = 3000;
 
+// API location for use with axios
+const API_URL = "https://my.api-server.com";
+// API auth (header style)
+const yourBearerToken = "r4nd0m-T3xT-4nd-Numb3rz";
+const config = {
+  headers: { Authorization: `Bearer ${yourBearerToken}` },
+};
 
 // adds the public/ directory needed for css
 app.use(express.static("public"));
@@ -25,7 +38,7 @@ app.listen(port, () => {
 
 // Serves the home page
 app.get("/", (req, res) =>  {
-  // for html file (uses Pathing stuff above):
+  // for static html file (uses Pathing stuff above):
   // res.sendFile(__dirname + "/public/index.html");
 
   // for ejs:
@@ -54,9 +67,18 @@ app.post("/new", (req, res) => {
   res.render("index.ejs", myObject);
 });
 
-app.post("/edit", (req, res) => {
-  var a = req.body.variable1; 
-  var b = req.body.variable2; 
+// POST using axios hitting an API
+
+app.post("/edit", async (req, res) => {
+  // assuming /edit/23 or some such ID was ther referring page
+  const searchId = req.body.id;
+  try {
+    const result = await axios.get(API_URL + "/ENDPOINT_HERE/" + searchId, config);
+    res.render("index.ejs", { content: JSON.stringify(result.data) });
+  } catch (error) {
+    res.render("index.ejs", { content: JSON.stringify(error.response.data) });
+  }
+
   res.render("index.ejs", {a, b});
 });
 
@@ -65,7 +87,14 @@ app.post("/edit", (req, res) => {
 app.get("/about", (req, res) => {
   res.render("about.ejs");
 });
-app.get("/contact", (req, res) => {
-  res.render("contact.ejs");
+
+// GET hitting an API endpoint with axios
+app.get("/", (req, res) => {
+  try {
+    const result = await axios.get(API_URL + "/random");
+      res.render("index.ejs", { content: JSON.stringify(result.data) });
+  } catch (error) {
+    res.render("index.ejs", { content: JSON.stringify(error.response.data) });
+  }
 });
 
