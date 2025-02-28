@@ -8,7 +8,7 @@ npm init -y
 
 # Add whatever you need here
 echo "Installing packages: express body-parser ejs"
-npm i express body-parser ejs
+npm i express body-parser ejs axios
 
 
 echo "Modifying the package.json file"
