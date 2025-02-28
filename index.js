@@ -89,7 +89,7 @@ app.get("/about", (req, res) => {
 });
 
 // GET hitting an API endpoint with axios
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   try {
     const result = await axios.get(API_URL + "/random");
       res.render("index.ejs", { content: JSON.stringify(result.data) });
